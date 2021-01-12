@@ -13,7 +13,7 @@ export default function App() {
   const handleFacesDetected = ({ faces }) => {
     if (faces.length > 0) {
       // setFaces = { faces };
-      console.log(`$faces[0].faceID`);
+      console.log(`${faces[0].faceID}`);
     }
   };
 
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     // justifyContent: "center",
   },
   camera: {
-    flex: 0,
+    flex: 1,
   },
   buttonContainer: {
     flex: 1,
