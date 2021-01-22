@@ -19,29 +19,44 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    var calTime;
     const _timeIncrease = setInterval(() => {
-      var getTime = {
-        hour: parseInt(time.hour, 10),
-        min: parseInt(time.min, 10),
-        sec: parseInt(time.sec, 10),
-      };
-      var getClock = {
-        hour: parseInt(clock.hour, 10),
-        min: parseInt(clock.min, 10),
-        sec: parseInt(clock.sec, 10),
-      };
-      setClock({
-        hour: getClock.hour,
-        min: getClock.min,
-        sec: getClock.sec + 1,
-      });
-      console.log(faces.length);
+      var getTime = { hour: time.hour, min: time.min, sec: time.sec };
+      var getClock = { hour: clock.hour, min: clock.min, sec: clock.sec };
+
+      // time + 1이 되기전에 useEffect가 다시 실행되서 time + 1이 제대로 안되는것 같아서 위치 변경
       if (faces.length != 0) {
-        setTime({ hour: getTime.hour, min: getTime.min, sec: getTime.sec + 1 });
+        calTime = _calTime(time);
+        setTime({ hour: calTime.hour, min: calTime.min, sec: calTime.sec });
       }
+
+      // useEffect 매초 실행되도록
+      calTime = _calTime(clock);
+      setClock({ hour: calTime.hour, min: calTime.min, sec: calTime.sec });
+      console.log(
+        `hour: ${calTime.hour}, min: ${calTime.min}, sec: ${calTime.sec}`
+      );
       clearInterval(_timeIncrease);
     }, 1000);
   }, [clock]);
+
+  const _calTime = (object) => {
+    var res = { hour: object.hour, min: object.min, sec: object.sec };
+    if (res.sec + 1 < 60) {
+      res.sec += 1;
+      return res;
+    } else {
+      res.sec = 0;
+      if (res.min + 1 < 60) {
+        res.min += 1;
+        return res;
+      } else {
+        res.min = 0;
+        res.hour += 1;
+        return res;
+      }
+    }
+  };
 
   const _handleFacesDetected = ({ faces }) => {
     if (faces.length > 0) {
