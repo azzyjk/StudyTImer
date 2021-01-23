@@ -1,6 +1,13 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  Button,
+  Text,
+  TouchableOpacity,
+  View,
+  Alert,
+} from "react-native";
 import * as FaceDetector from "expo-face-detector";
 import { Camera } from "expo-camera";
 
@@ -10,6 +17,8 @@ export default function App() {
   const [faces, setFaces] = useState([]);
   const [time, setTime] = useState({ hour: 0, min: 0, sec: 0 });
   const [clock, setClock] = useState({ hour: 0, min: 0, sec: 0 });
+  const [isMeasure, setIsMeasure] = useState(false);
+  const [measureText, setMeasureText] = useState("측정 시작");
 
   useEffect(() => {
     (async () => {
@@ -25,7 +34,8 @@ export default function App() {
       var getClock = { hour: clock.hour, min: clock.min, sec: clock.sec };
 
       // time + 1이 되기전에 useEffect가 다시 실행되서 time + 1이 제대로 안되는것 같아서 위치 변경
-      if (faces.length != 0) {
+      console.log(`facelength : ${faces.length}, isMeasure:${isMeasure}`);
+      if (faces.length != 0 && isMeasure == true) {
         calTime = _calTime(time);
         setTime({ hour: calTime.hour, min: calTime.min, sec: calTime.sec });
       }
@@ -33,9 +43,9 @@ export default function App() {
       // useEffect 매초 실행되도록
       calTime = _calTime(clock);
       setClock({ hour: calTime.hour, min: calTime.min, sec: calTime.sec });
-      console.log(
-        `hour: ${calTime.hour}, min: ${calTime.min}, sec: ${calTime.sec}`
-      );
+      // console.log(
+      //   `hour: ${calTime.hour}, min: ${calTime.min}, sec: ${calTime.sec}`
+      // );
       clearInterval(_timeIncrease);
     }, 1000);
   }, [clock]);
@@ -66,6 +76,18 @@ export default function App() {
     }
   };
 
+  const _changeState = () => {
+    // console.log(`Miseasure : ${isMeasure}`);
+    if (isMeasure == false) {
+      setIsMeasure(true);
+      Alert.alert(`측정을 시작합니다.`);
+      setMeasureText("측정 종료");
+    } else {
+      setIsMeasure(false);
+      setMeasureText("측정 시작");
+    }
+  };
+
   if (hasPermission == null) {
     return <View />;
   }
@@ -86,9 +108,16 @@ export default function App() {
           tracking: true,
         }}
       ></Camera>
-      <Text style={styles.timerText}>
-        {time.hour}시 {time.min}분 {time.sec}초
-      </Text>
+      <View style={styles.textContainer}>
+        <Text style={styles.timerText}>
+          {time.hour}시 {time.min}분 {time.sec}초
+        </Text>
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={_changeState}>
+          <Text style={styles.buttonText}> {measureText} </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -98,7 +127,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   camera: {
-    flex: 0.5,
+    flex: 0,
+  },
+  textContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonContainer: {
     flex: 1,
@@ -107,15 +141,18 @@ const styles = StyleSheet.create({
     margin: 20,
   },
   button: {
-    flex: 0.1,
+    flex: 1,
     alignSelf: "flex-end",
     alignItems: "center",
+  },
+  buttonText: {
+    fontSize: 18,
   },
   text: {
     fontSize: 18,
     color: "white",
   },
   timerText: {
-    fontSize: 24,
+    fontSize: 32,
   },
 });
