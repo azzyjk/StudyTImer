@@ -8,7 +8,9 @@ import {
   View,
   Alert,
 } from "react-native";
+import { format } from "date-fns";
 import * as FaceDetector from "expo-face-detector";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Camera } from "expo-camera";
 
 export default function App() {
@@ -34,7 +36,6 @@ export default function App() {
       var getClock = { hour: clock.hour, min: clock.min, sec: clock.sec };
 
       // time + 1이 되기전에 useEffect가 다시 실행되서 time + 1이 제대로 안되는것 같아서 위치 변경
-      console.log(`facelength : ${faces.length}, isMeasure:${isMeasure}`);
       if (faces.length != 0 && isMeasure == true) {
         calTime = _calTime(time);
         setTime({ hour: calTime.hour, min: calTime.min, sec: calTime.sec });
@@ -43,9 +44,6 @@ export default function App() {
       // useEffect 매초 실행되도록
       calTime = _calTime(clock);
       setClock({ hour: calTime.hour, min: calTime.min, sec: calTime.sec });
-      // console.log(
-      //   `hour: ${calTime.hour}, min: ${calTime.min}, sec: ${calTime.sec}`
-      // );
       clearInterval(_timeIncrease);
     }, 1000);
   }, [clock]);
@@ -66,6 +64,27 @@ export default function App() {
         return res;
       }
     }
+  };
+  const _saveData = async () => {
+    try {
+      var day = String(new Date().getDate());
+      var month = String(new Date().getMonth() + 1);
+      var year = String(new Date().getFullYear());
+      var date = year + month + day;
+      // const date = new Date();
+      // const formattedDate = format(date, "NN");
+      // console.log(date);
+      // console.log(formattedDate);
+      const data = "testing azzyjk";
+      await AsyncStorage.setItem(date, data);
+    } catch (e) {}
+  };
+  const _loadData = async () => {
+    try {
+      // const data = await AsyncStorage.getItem("data");
+      const data = await AsyncStorage.getAllKeys();
+      console.log(data);
+    } catch (e) {}
   };
 
   const _handleFacesDetected = ({ faces }) => {
@@ -116,6 +135,16 @@ export default function App() {
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={_changeState}>
           <Text style={styles.buttonText}> {measureText} </Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={_saveData}>
+          <Text style={styles.buttonText}> Save</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={_loadData}>
+          <Text style={styles.buttonText}> Load</Text>
         </TouchableOpacity>
       </View>
     </View>
