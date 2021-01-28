@@ -67,16 +67,10 @@ export default function App() {
   };
   const _saveData = async () => {
     try {
-      var day = String(new Date().getDate());
-      var month = String(new Date().getMonth() + 1);
-      var year = String(new Date().getFullYear());
-      var date = year + month + day;
-      // const date = new Date();
-      // const formattedDate = format(date, "NN");
-      // console.log(date);
-      // console.log(formattedDate);
-      const data = "testing azzyjk";
-      await AsyncStorage.setItem(date, data);
+      const formattedDate = format(new Date(), "yyyyMMdd");
+      console.log(formattedDate);
+      // const data = "testing azzyjk";
+      // await AsyncStorage.setItem(date, data);
     } catch (e) {}
   };
   const _loadData = async () => {
