@@ -22,5 +22,8 @@
   "devDependencies": {
     "@babel/core": "~7.9.0"
   },
+  "resolutions": {
+    "@react-native-community/cli-debugger-ui": "4.7.0"
+  },
   "private": true
 }

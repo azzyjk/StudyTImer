@@ -65,19 +65,34 @@ export default function App() {
       }
     }
   };
-  const _saveData = async () => {
+  const _saveData = async (test) => {
     try {
+      const savedData = await AsyncStorage.getItem(formattedDate);
       const formattedDate = format(new Date(), "yyyyMMdd");
       console.log(formattedDate);
-      // const data = "testing azzyjk";
-      // await AsyncStorage.setItem(date, data);
+      console.log(savedData);
+      if (savedData == null) {
+        await AsyncStorage.setItem(formattedDate, JSON.stringify(time));
+      } else {
+        var data = JSON.parse(savedData);
+        console.log(data);
+      }
+
+      // console.log(test);
+      // // Alert.alert(`저장합니다.`);
+      // // const savedData = "testing azzyjk";
+      // // await AsyncStorage.setItem(date, data);
+      // const testing = "a1";
+      // await AsyncStorage.setItem(testing, "2");
+      // // await AsyncStorage.setItem(date, data);
     } catch (e) {}
   };
   const _loadData = async () => {
     try {
-      // const data = await AsyncStorage.getItem("data");
-      const data = await AsyncStorage.getAllKeys();
-      console.log(data);
+      const data = await AsyncStorage.getItem("20210201");
+      // const data = await AsyncStorage.getAllKeys();
+      console.log(JSON.parse(data));
+      // Alert.alert(`불러옵니다.`);
     } catch (e) {}
   };
 
@@ -97,6 +112,7 @@ export default function App() {
       setMeasureText("측정 종료");
     } else {
       setIsMeasure(false);
+      Alert.alert(`측정을 종료합니다.`);
       setMeasureText("측정 시작");
     }
   };
@@ -132,7 +148,7 @@ export default function App() {
         </TouchableOpacity>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={_saveData}>
+        <TouchableOpacity style={styles.button} onPress={() => _saveData(time)}>
           <Text style={styles.buttonText}> Save</Text>
         </TouchableOpacity>
       </View>
