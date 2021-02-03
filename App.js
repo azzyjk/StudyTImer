@@ -21,6 +21,7 @@ export default function App() {
   const [realTime, setrealTime] = useState({ hour: 0, min: 0, sec: 0 });
   const [isMeasure, setIsMeasure] = useState(false);
   const [measureText, setMeasureText] = useState("측정 시작");
+  // const [savedData, setSavedData] = 
 
   useEffect(() => {
     (async () => {
@@ -65,6 +66,7 @@ export default function App() {
       }
     }
   };
+ 
   const _saveData = async (studyTime) => {
     try {
       const formattedDate = format(new Date(), "yyyyMMdd");
@@ -72,32 +74,39 @@ export default function App() {
       if (savedData == null) {
         await AsyncStorage.setItem(formattedDate, JSON.stringify(studyTime));
       } else {
-        var data = JSON.parse(savedData);
-        data.hour += studystudyTime.hour;
-        data.min += studyTime.min;
-        data.sec += studyTime.sec;
-        console.log(data);
+        var savedTime = JSON.parse(savedData);
+        savedTime.hour += studyTime.hour;
+        savedTime.min += studyTime.min;
+        savedTime.sec += studyTime.sec;
+        console.log(savedTime);
+        
+        await AsyncStorage.setItem(formattedDate, JSON.stringify(savedTime));
       }
       setStudyTime({hour:0, min:0, sec:0});
 
-      // console.log(test);
-      // // Alert.alert(`저장합니다.`);
-      // // const savedData = "testing azzyjk";
-      // // await AsyncStorage.setItem(date, data);
-      // const testing = "a1";
-      // await AsyncStorage.setItem(testing, "2");
-      // // await AsyncStorage.setItem(date, data);
+      Alert.alert(`저장되었습니다.`);
+
     } catch (e) {}
   };
   const _loadAllData = async () => {
     try {
-      const data = await AsyncStorage.getItem("20210201");
-      // const data = await AsyncStorage.getAllKeys();
-      console.log(JSON.parse(data));
+      // const data = await AsyncStorage.getItem("20210201");
+      // console.log(JSON.parse(data));
+      const keys = await AsyncStorage.getAllKeys();
+      _loadData(keys);
       // Alert.alert(`불러옵니다.`);
     } catch (e) {}
   };
-
+  
+  const _loadData = (keys) => {
+    var object = {"name" : "test"};
+    
+    keys.forEach( async (element) => {
+      console.log(object);
+      // element, await AsyncStorage.getItem(element)
+      // console.log(test);
+    });
+  }
   const _handleFacesDetected = ({ faces }) => {
     if (faces.length > 0) {
       setFaces(faces);
@@ -107,7 +116,6 @@ export default function App() {
   };
 
   const _changeState = () => {
-    // console.log(`Miseasure : ${isMeasure}`);
     if (isMeasure == false) {
       setIsMeasure(true);
       Alert.alert(`측정을 시작합니다.`);
@@ -179,7 +187,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "transparent",
     flexDirection: "row",
-    margin: 20,
+    margin: 40,
   },
   button: {
     flex: 1,
