@@ -17,8 +17,8 @@ export default function App() {
   const [hasPermission, setHasPermission] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.front);
   const [faces, setFaces] = useState([]);
-  const [time, setTime] = useState({ hour: 0, min: 0, sec: 0 });
-  const [clock, setClock] = useState({ hour: 0, min: 0, sec: 0 });
+  const [studyTime, setStudyTime] = useState({ hour: 0, min: 0, sec: 0 });
+  const [realTime, setrealTime] = useState({ hour: 0, min: 0, sec: 0 });
   const [isMeasure, setIsMeasure] = useState(false);
   const [measureText, setMeasureText] = useState("측정 시작");
 
@@ -32,21 +32,21 @@ export default function App() {
   useEffect(() => {
     var calTime;
     const _timeIncrease = setInterval(() => {
-      var getTime = { hour: time.hour, min: time.min, sec: time.sec };
-      var getClock = { hour: clock.hour, min: clock.min, sec: clock.sec };
+      var getTime = { hour: studyTime.hour, min: studyTime.min, sec: studyTime.sec };
+      var getrealTime = { hour: realTime.hour, min: realTime.min, sec: realTime.sec };
 
       // time + 1이 되기전에 useEffect가 다시 실행되서 time + 1이 제대로 안되는것 같아서 위치 변경
       if (faces.length != 0 && isMeasure == true) {
-        calTime = _calTime(time);
-        setTime({ hour: calTime.hour, min: calTime.min, sec: calTime.sec });
+        calTime = _calTime(studyTime);
+        setStudyTime({ hour: calTime.hour, min: calTime.min, sec: calTime.sec });
       }
 
       // useEffect 매초 실행되도록
-      calTime = _calTime(clock);
-      setClock({ hour: calTime.hour, min: calTime.min, sec: calTime.sec });
+      calTime = _calTime(realTime);
+      setrealTime({ hour: calTime.hour, min: calTime.min, sec: calTime.sec });
       clearInterval(_timeIncrease);
     }, 1000);
-  }, [clock]);
+  }, [realTime]);
 
   const _calTime = (object) => {
     var res = { hour: object.hour, min: object.min, sec: object.sec };
@@ -65,18 +65,20 @@ export default function App() {
       }
     }
   };
-  const _saveData = async (test) => {
+  const _saveData = async (studyTime) => {
     try {
-      const savedData = await AsyncStorage.getItem(formattedDate);
       const formattedDate = format(new Date(), "yyyyMMdd");
-      console.log(formattedDate);
-      console.log(savedData);
+      const savedData = await AsyncStorage.getItem(formattedDate);
       if (savedData == null) {
-        await AsyncStorage.setItem(formattedDate, JSON.stringify(time));
+        await AsyncStorage.setItem(formattedDate, JSON.stringify(studyTime));
       } else {
         var data = JSON.parse(savedData);
+        data.hour += studystudyTime.hour;
+        data.min += studyTime.min;
+        data.sec += studyTime.sec;
         console.log(data);
       }
+      setStudyTime({hour:0, min:0, sec:0});
 
       // console.log(test);
       // // Alert.alert(`저장합니다.`);
@@ -87,7 +89,7 @@ export default function App() {
       // // await AsyncStorage.setItem(date, data);
     } catch (e) {}
   };
-  const _loadData = async () => {
+  const _loadAllData = async () => {
     try {
       const data = await AsyncStorage.getItem("20210201");
       // const data = await AsyncStorage.getAllKeys();
@@ -139,7 +141,7 @@ export default function App() {
       ></Camera>
       <View style={styles.textContainer}>
         <Text style={styles.timerText}>
-          {time.hour}시 {time.min}분 {time.sec}초
+          {studyTime.hour}시 {studyTime.min}분 {studyTime.sec}초
         </Text>
       </View>
       <View style={styles.buttonContainer}>
@@ -148,12 +150,12 @@ export default function App() {
         </TouchableOpacity>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => _saveData(time)}>
+        <TouchableOpacity style={styles.button} onPress={() => _saveData(studyTime)}>
           <Text style={styles.buttonText}> Save</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={_loadData}>
+        <TouchableOpacity style={styles.button} onPress={_loadAllData}>
           <Text style={styles.buttonText}> Load</Text>
         </TouchableOpacity>
       </View>
