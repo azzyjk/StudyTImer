@@ -21,7 +21,7 @@ export default function App() {
   const [realTime, setrealTime] = useState({ hour: 0, min: 0, sec: 0 });
   const [isMeasure, setIsMeasure] = useState(false);
   const [measureText, setMeasureText] = useState("측정 시작");
-  // const [savedData, setSavedData] = 
+  const [savedData, setSavedData] = useState({});
 
   useEffect(() => {
     (async () => {
@@ -33,13 +33,25 @@ export default function App() {
   useEffect(() => {
     var calTime;
     const _timeIncrease = setInterval(() => {
-      var getTime = { hour: studyTime.hour, min: studyTime.min, sec: studyTime.sec };
-      var getrealTime = { hour: realTime.hour, min: realTime.min, sec: realTime.sec };
+      var getTime = {
+        hour: studyTime.hour,
+        min: studyTime.min,
+        sec: studyTime.sec,
+      };
+      var getrealTime = {
+        hour: realTime.hour,
+        min: realTime.min,
+        sec: realTime.sec,
+      };
 
       // time + 1이 되기전에 useEffect가 다시 실행되서 time + 1이 제대로 안되는것 같아서 위치 변경
       if (faces.length != 0 && isMeasure == true) {
         calTime = _calTime(studyTime);
-        setStudyTime({ hour: calTime.hour, min: calTime.min, sec: calTime.sec });
+        setStudyTime({
+          hour: calTime.hour,
+          min: calTime.min,
+          sec: calTime.sec,
+        });
       }
 
       // useEffect 매초 실행되도록
@@ -66,7 +78,7 @@ export default function App() {
       }
     }
   };
- 
+
   const _saveData = async (studyTime) => {
     try {
       const formattedDate = format(new Date(), "yyyyMMdd");
@@ -79,13 +91,12 @@ export default function App() {
         savedTime.min += studyTime.min;
         savedTime.sec += studyTime.sec;
         console.log(savedTime);
-        
+
         await AsyncStorage.setItem(formattedDate, JSON.stringify(savedTime));
       }
-      setStudyTime({hour:0, min:0, sec:0});
+      setStudyTime({ hour: 0, min: 0, sec: 0 });
 
       Alert.alert(`저장되었습니다.`);
-
     } catch (e) {}
   };
   const _loadAllData = async () => {
@@ -93,20 +104,23 @@ export default function App() {
       // const data = await AsyncStorage.getItem("20210201");
       // console.log(JSON.parse(data));
       const keys = await AsyncStorage.getAllKeys();
+      console.log(keys);
       _loadData(keys);
       // Alert.alert(`불러옵니다.`);
     } catch (e) {}
   };
-  
+
   const _loadData = (keys) => {
-    var object = {"name" : "test"};
-    
-    keys.forEach( async (element) => {
-      console.log(object);
-      // element, await AsyncStorage.getItem(element)
+    var object = { name: "test" };
+    object.test = "hello";
+    keys.forEach(async (element) => {
+      console.log(savedData);
+      setSavedData(element, await AsyncStorage.getItem(element));
+      // console.log(object);
+      // element, await AsyncStorage.getItem(element);
       // console.log(test);
     });
-  }
+  };
   const _handleFacesDetected = ({ faces }) => {
     if (faces.length > 0) {
       setFaces(faces);
@@ -157,8 +171,14 @@ export default function App() {
           <Text style={styles.buttonText}> {measureText} </Text>
         </TouchableOpacity>
       </View>
+      {Object.values(studyTime).map(() => (
+        <Text> test </Text>
+      ))}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => _saveData(studyTime)}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => _saveData(studyTime)}
+        >
           <Text style={styles.buttonText}> Save</Text>
         </TouchableOpacity>
       </View>
