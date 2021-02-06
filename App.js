@@ -79,19 +79,30 @@ export default function App() {
     }
   };
 
+  // 저장된 시간을 불러와서 현재 측정된 시간과 더했을때 60이 넘을 경우 처리
+  const _calSavedData = (saved, now) => {
+    saved.sec += now.sec;
+    if (saved.sec > 60) {
+      saved.sec -= 60;
+      saved.min += 1;
+    }
+    saved.min += now.min;
+    if (saved.min > 60) {
+      saved.min -= 60;
+      saved.hour += 1;
+    }
+    return saved;
+  };
+
   const _saveData = async (studyTime) => {
     try {
       const formattedDate = format(new Date(), "yyyyMMdd");
-      const savedData = await AsyncStorage.getItem(formattedDate);
-      if (savedData == null) {
+      const todayData = await AsyncStorage.getItem(formattedDate);
+      if (todayData == null) {
         await AsyncStorage.setItem(formattedDate, JSON.stringify(studyTime));
       } else {
-        var savedTime = JSON.parse(savedData);
-        savedTime.hour += studyTime.hour;
-        savedTime.min += studyTime.min;
-        savedTime.sec += studyTime.sec;
-        console.log(savedTime);
-
+        var savedTime = JSON.parse(todayData);
+        savedTime = _calSavedData(savedTime, studyTime);
         await AsyncStorage.setItem(formattedDate, JSON.stringify(savedTime));
       }
       setStudyTime({ hour: 0, min: 0, sec: 0 });
@@ -99,28 +110,27 @@ export default function App() {
       Alert.alert(`저장되었습니다.`);
     } catch (e) {}
   };
+
   const _loadAllData = async () => {
     try {
-      // const data = await AsyncStorage.getItem("20210201");
-      // console.log(JSON.parse(data));
       const keys = await AsyncStorage.getAllKeys();
       console.log(keys);
       _loadData(keys);
-      // Alert.alert(`불러옵니다.`);
     } catch (e) {}
   };
 
   const _loadData = (keys) => {
-    var object = { name: "test" };
-    object.test = "hello";
+    setSavedData({});
     keys.forEach(async (element) => {
-      console.log(savedData);
-      setSavedData(element, await AsyncStorage.getItem(element));
-      // console.log(object);
-      // element, await AsyncStorage.getItem(element);
-      // console.log(test);
+      var data = await AsyncStorage.getItem(element);
+      setSavedData((prevState) => ({
+        ...prevState,
+        [element]: data,
+      }));
     });
+    console.log(`savedData : ${JSON.stringify(savedData, null, 2)}`);
   };
+
   const _handleFacesDetected = ({ faces }) => {
     if (faces.length > 0) {
       setFaces(faces);
