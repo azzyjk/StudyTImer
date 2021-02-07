@@ -12,6 +12,14 @@ import { format } from "date-fns";
 import * as FaceDetector from "expo-face-detector";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Camera } from "expo-camera";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+
+import HomeScreen from "./navigation/Home";
+import DetailsScreen from "./navigation/Detail";
+import TimerScreen from "./navigation/Timer";
+
+const Stack = createStackNavigator();
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(null);
@@ -158,46 +166,56 @@ export default function App() {
     return <Text> No access to camera</Text>;
   }
   return (
-    <View style={styles.container}>
-      <Camera
-        style={styles.camera}
-        type={type}
-        onFacesDetected={_handleFacesDetected}
-        faceDetectorSettings={{
-          mode: FaceDetector.Constants.Mode.fast,
-          detectLandmarks: FaceDetector.Constants.Landmarks.all,
-          runClassifications: FaceDetector.Constants.Classifications.all,
-          minDetetectionInterval: 1000,
-          tracking: true,
-        }}
-      ></Camera>
-      <View style={styles.textContainer}>
-        <Text style={styles.timerText}>
-          {studyTime.hour}시 {studyTime.min}분 {studyTime.sec}초
-        </Text>
-      </View>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={_changeState}>
-          <Text style={styles.buttonText}> {measureText} </Text>
-        </TouchableOpacity>
-      </View>
-      {Object.values(studyTime).map(() => (
-        <Text> test </Text>
-      ))}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => _saveData(studyTime)}
-        >
-          <Text style={styles.buttonText}> Save</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={_loadAllData}>
-          <Text style={styles.buttonText}> Load</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ title: "Overview" }}
+        />
+        <Stack.Screen name="Details" component={DetailsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+    // <View style={styles.container}>
+    //   <Camera
+    //     style={styles.camera}
+    //     type={type}
+    //     onFacesDetected={_handleFacesDetected}
+    //     faceDetectorSettings={{
+    //       mode: FaceDetector.Constants.Mode.fast,
+    //       detectLandmarks: FaceDetector.Constants.Landmarks.all,
+    //       runClassifications: FaceDetector.Constants.Classifications.all,
+    //       minDetetectionInterval: 1000,
+    //       tracking: true,
+    //     }}
+    //   ></Camera>
+    //   <View style={styles.textContainer}>
+    //     <Text style={styles.timerText}>
+    //       {studyTime.hour}시 {studyTime.min}분 {studyTime.sec}초
+    //     </Text>
+    //   </View>
+    //   <View style={styles.buttonContainer}>
+    //     <TouchableOpacity style={styles.button} onPress={_changeState}>
+    //       <Text style={styles.buttonText}> {measureText} </Text>
+    //     </TouchableOpacity>
+    //   </View>
+    //   {Object.values(studyTime).map(() => (
+    //     <Text> test </Text>
+    //   ))}
+    //   <View style={styles.buttonContainer}>
+    //     <TouchableOpacity
+    //       style={styles.button}
+    //       onPress={() => _saveData(studyTime)}
+    //     >
+    //       <Text style={styles.buttonText}> Save</Text>
+    //     </TouchableOpacity>
+    //   </View>
+    //   <View style={styles.buttonContainer}>
+    //     <TouchableOpacity style={styles.button} onPress={_loadAllData}>
+    //       <Text style={styles.buttonText}> Load</Text>
+    //     </TouchableOpacity>
+    //   </View>
+    // </View>
   );
 }
 
